@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkinLog — Auth Test</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      color: #a78bfa;
+    }
+
+    h1 span { color: #e2e8f0; }
+
+    .card {
+      background: #1e2130;
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid #2d3148;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 8px 0;
+      border: none;
+      border-radius: 8px;
+      background: #2d3148;
+      color: #94a3b8;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .tab.active {
+      background: #7c3aed;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    label { font-size: 0.82rem; color: #94a3b8; font-weight: 500; }
+
+    input {
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #e2e8f0;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input:focus { border-color: #7c3aed; }
+
+    .btn {
+      width: 100%;
+      padding: 11px;
+      border: none;
+      border-radius: 8px;
+      background: #7c3aed;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 4px;
+    }
+
+    .btn:hover { background: #6d28d9; }
+    .btn:disabled { background: #4b5563; cursor: not-allowed; }
+
+    .error-box {
+      background: #3b1a1a;
+      border: 1px solid #7f1d1d;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      color: #fca5a5;
+      display: none;
+    }
+
+    .success-box {
+      background: #1a3a2a;
+      border: 1px solid #166534;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      color: #86efac;
+      display: none;
+    }
+
+    .token-section { display: none; }
+
+    .token-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .token-header h3 { font-size: 0.95rem; font-weight: 600; }
+
+    .user-badge {
+      font-size: 0.8rem;
+      background: #2d3148;
+      padding: 4px 10px;
+      border-radius: 20px;
+      color: #a78bfa;
+    }
+
+    .token-box {
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      word-break: break-all;
+      max-height: 90px;
+      overflow-y: auto;
+      margin-bottom: 8px;
+      font-family: monospace;
+    }
+
+    .copy-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border: 1px solid #7c3aed;
+      border-radius: 8px;
+      background: transparent;
+      color: #a78bfa;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .copy-btn:hover { background: #2d1f5e; }
+    .copy-btn.copied { border-color: #16a34a; color: #86efac; }
+
+    .token-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .logout-btn {
+      padding: 8px 14px;
+      border: 1px solid #7f1d1d;
+      border-radius: 8px;
+      background: transparent;
+      color: #fca5a5;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .logout-btn:hover { background: #3b1a1a; }
+
+    .me-box {
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      font-family: monospace;
+      white-space: pre-wrap;
+      display: none;
+    }
+
+    .divider {
+      height: 1px;
+      background: #2d3148;
+      margin: 14px 0;
+    }
+
+    .api-url {
+      font-size: 0.78rem;
+      color: #4b5563;
+      text-align: center;
+    }
+
+    .api-url span { color: #6d28d9; }
+
+    #spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid #ffffff44;
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Skin<span>Log</span> — Auth Test</h1>
+
+  <div class="card" id="auth-card">
+    <div class="tabs">
+      <button class="tab active" id="tab-login" onclick="switchTab('login')">Login</button>
+      <button class="tab" id="tab-signup" onclick="switchTab('signup')">Cadastro</button>
+    </div>
+
+    <div id="form-login">
+      <div class="form-group">
+        <label for="l-email">Email</label>
+        <input type="email" id="l-email" placeholder="seu@email.com" />
+      </div>
+      <div class="form-group">
+        <label for="l-password">Senha</label>
+        <input type="password" id="l-password" placeholder="••••••" />
+      </div>
+      <div class="error-box" id="login-error"></div>
+      <div class="success-box" id="login-success"></div>
+      <button class="btn" id="btn-login" onclick="doLogin()">Entrar</button>
+    </div>
+
+    <div id="form-signup" style="display:none">
+      <div class="form-group">
+        <label for="s-name">Nome</label>
+        <input type="text" id="s-name" placeholder="Seu nome" />
+      </div>
+      <div class="form-group">
+        <label for="s-email">Email</label>
+        <input type="email" id="s-email" placeholder="seu@email.com" />
+      </div>
+      <div class="form-group">
+        <label for="s-password">Senha (mín. 6 chars)</label>
+        <input type="password" id="s-password" placeholder="••••••" />
+      </div>
+      <div class="error-box" id="signup-error"></div>
+      <div class="success-box" id="signup-success"></div>
+      <button class="btn" id="btn-signup" onclick="doSignup()">Criar conta</button>
+    </div>
+  </div>
+
+  <div class="card token-section" id="token-section">
+    <div class="token-header">
+      <h3>Sessão ativa</h3>
+      <span class="user-badge" id="user-badge">—</span>
+    </div>
+
+    <div style="margin-bottom:6px;font-size:0.8rem;color:#64748b">Access Token</div>
+    <div class="token-box" id="access-token-box">—</div>
+    <div class="token-actions">
+      <button class="copy-btn" id="copy-access" onclick="copyToken('access')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copiar access token
+      </button>
+      <button class="copy-btn" id="copy-refresh" onclick="copyToken('refresh')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copiar refresh token
+      </button>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <button class="copy-btn" style="margin-bottom:10px" onclick="fetchMe()">
+      Buscar /me
+    </button>
+    <div class="me-box" id="me-box"></div>
+  </div>
+
+  <div class="card token-section" id="records-section">
+    <h3 style="margin-bottom:14px">Records</h3>
+
+    <div style="margin-bottom:14px">
+      <div style="font-size:0.82rem;color:#94a3b8;margin-bottom:6px;font-weight:500">Criar registro</div>
+      <div class="form-group">
+        <label for="r-photo">Foto (JPEG/PNG/WebP)</label>
+        <input type="file" id="r-photo" accept="image/jpeg,image/png,image/webp" />
+      </div>
+      <div class="form-group">
+        <label for="r-notes">Notas (opcional)</label>
+        <input type="text" id="r-notes" placeholder="Observações..." />
+      </div>
+      <button class="btn" onclick="createRecord()">Enviar registro</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <button class="copy-btn" onclick="listRecords()">GET /records</button>
+      <button class="copy-btn" onclick="loadMore()">Load more</button>
+      <button class="copy-btn" onclick="getStreak()">GET /records/streak</button>
+      <button class="copy-btn" onclick="getLatest()">GET /records/latest</button>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <div style="font-size:0.82rem;color:#94a3b8;margin-bottom:6px;font-weight:500">Buscar por ID</div>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="r-id" placeholder="UUID do registro" style="flex:1" />
+        <button class="copy-btn" onclick="getRecordById()">GET</button>
+        <button class="logout-btn" onclick="deleteRecord()">DELETE</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <div style="font-size:0.82rem;color:#94a3b8;margin-bottom:6px;font-weight:500">Comparar registros</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input type="text" id="r-id-a" placeholder="UUID registro A" style="flex:1" />
+        <input type="text" id="r-id-b" placeholder="UUID registro B" style="flex:1" />
+        <button class="copy-btn" onclick="compareRecords()">Comparar</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div style="font-size:0.82rem;color:#94a3b8;margin-bottom:6px;font-weight:500">Resposta</div>
+    <div class="me-box" id="records-output" style="display:block;max-height:300px;overflow-y:auto">—</div>
+  </div>
+
+  <p class="api-url">API: <span id="api-base">http://localhost:8000/api/v1</span></p>
+</div>
+
+<script>
+  const API = 'http://localhost:8000/api/v1';
+  let tokens = { access: '', refresh: '' };
+
+  function switchTab(tab) {
+    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+    document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+    document.getElementById('form-login').style.display = tab === 'login' ? '' : 'none';
+    document.getElementById('form-signup').style.display = tab === 'signup' ? '' : 'none';
+  }
+
+  function showMsg(id, msg, isError) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.style.display = 'block';
+    if (!isError) setTimeout(() => el.style.display = 'none', 4000);
+  }
+
+  function setLoading(btnId, loading) {
+    const btn = document.getElementById(btnId);
+    if (loading) {
+      btn._orig = btn.innerHTML;
+      btn.innerHTML = '<span id="spinner"></span>Aguardando...';
+      btn.disabled = true;
+    } else {
+      btn.innerHTML = btn._orig;
+      btn.disabled = false;
+    }
+  }
+
+  function showSession(data) {
+    tokens.access = data.access_token;
+    tokens.refresh = data.refresh_token;
+    document.getElementById('access-token-box').textContent = data.access_token;
+    document.getElementById('user-badge').textContent = data.user.email;
+    document.getElementById('token-section').style.display = 'block';
+    document.getElementById('records-section').style.display = 'block';
+    document.getElementById('me-box').style.display = 'none';
+    document.getElementById('me-box').textContent = '';
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
+
+  async function doLogin() {
+    const email = document.getElementById('l-email').value.trim();
+    const password = document.getElementById('l-password').value;
+    document.getElementById('login-error').style.display = 'none';
+    document.getElementById('login-success').style.display = 'none';
+
+    if (!email || !password) {
+      showMsg('login-error', 'Preencha email e senha.', true);
+      return;
+    }
+
+    setLoading('btn-login', true);
+    try {
+      const res = await fetch(`${API}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Erro ao fazer login.');
+      showMsg('login-success', `Bem-vindo, ${data.user.name || data.user.email}!`, false);
+      showSession(data);
+    } catch (e) {
+      showMsg('login-error', e.message, true);
+    } finally {
+      setLoading('btn-login', false);
+    }
+  }
+
+  async function doSignup() {
+    const name = document.getElementById('s-name').value.trim();
+    const email = document.getElementById('s-email').value.trim();
+    const password = document.getElementById('s-password').value;
+    document.getElementById('signup-error').style.display = 'none';
+    document.getElementById('signup-success').style.display = 'none';
+
+    if (!name || !email || !password) {
+      showMsg('signup-error', 'Preencha todos os campos.', true);
+      return;
+    }
+    if (password.length < 6) {
+      showMsg('signup-error', 'Senha deve ter pelo menos 6 caracteres.', true);
+      return;
+    }
+
+    setLoading('btn-signup', true);
+    try {
+      const res = await fetch(`${API}/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Erro ao criar conta.');
+      showMsg('signup-success', `Conta criada! Bem-vindo, ${data.user.name}!`, false);
+      showSession(data);
+    } catch (e) {
+      showMsg('signup-error', e.message, true);
+    } finally {
+      setLoading('btn-signup', false);
+    }
+  }
+
+  async function doLogout() {
+    if (!tokens.access) return;
+    try {
+      await fetch(`${API}/auth/logout`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${tokens.access}` },
+      });
+    } catch (_) {}
+    tokens = { access: '', refresh: '' };
+    document.getElementById('token-section').style.display = 'none';
+    document.getElementById('records-section').style.display = 'none';
+  }
+
+  async function fetchMe() {
+    if (!tokens.access) return;
+    const box = document.getElementById('me-box');
+    box.textContent = 'Carregando...';
+    box.style.display = 'block';
+    try {
+      const res = await fetch(`${API}/auth/me`, {
+        headers: { Authorization: `Bearer ${tokens.access}` },
+      });
+      const data = await res.json();
+      box.textContent = JSON.stringify(data, null, 2);
+    } catch (e) {
+      box.textContent = `Erro: ${e.message}`;
+    }
+  }
+
+  function copyToken(type) {
+    const token = type === 'access' ? tokens.access : tokens.refresh;
+    if (!token) return;
+    navigator.clipboard.writeText(token).then(() => {
+      const btn = document.getElementById(`copy-${type}`);
+      const orig = btn.innerHTML;
+      btn.classList.add('copied');
+      btn.textContent = 'Copiado!';
+      setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  function rOut(data) {
+    document.getElementById('records-output').textContent = JSON.stringify(data, null, 2);
+  }
+
+  async function rFetch(path, opts = {}) {
+    const out = document.getElementById('records-output');
+    out.textContent = 'Carregando...';
+    try {
+      const res = await fetch(`${API}/records${path}`, {
+        ...opts,
+        headers: { Authorization: `Bearer ${tokens.access}`, ...(opts.headers || {}) },
+      });
+      if (res.status === 204) { rOut({ status: 'ok (204)' }); return null; }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+      rOut(data);
+      return data;
+    } catch (e) {
+      rOut({ error: e.message });
+      return null;
+    }
+  }
+
+  let nextCursor = null;
+  async function listRecords() {
+    const data = await rFetch('?limit=20');
+    if (data) nextCursor = data.next_cursor;
+  }
+  async function loadMore() {
+    if (!nextCursor) return rOut({ info: 'No more records' });
+    const data = await rFetch(`?limit=20&cursor=${encodeURIComponent(nextCursor)}`);
+    if (data) nextCursor = data.next_cursor;
+  }
+  async function getStreak() { await rFetch('/streak'); }
+  async function getLatest() { await rFetch('/latest'); }
+  async function getRecordById() {
+    const id = document.getElementById('r-id').value.trim();
+    if (!id) return rOut({ error: 'Informe o UUID' });
+    await rFetch(`/${id}`);
+  }
+  async function deleteRecord() {
+    const id = document.getElementById('r-id').value.trim();
+    if (!id) return rOut({ error: 'Informe o UUID' });
+    await rFetch(`/${id}`, { method: 'DELETE' });
+  }
+  async function compareRecords() {
+    const a = document.getElementById('r-id-a').value.trim();
+    const b = document.getElementById('r-id-b').value.trim();
+    if (!a || !b) return rOut({ error: 'Informe os dois UUIDs' });
+    await rFetch('/compare', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ record_id_a: a, record_id_b: b }),
+    });
+  }
+  async function createRecord() {
+    const fileInput = document.getElementById('r-photo');
+    const notes = document.getElementById('r-notes').value.trim();
+    if (!fileInput.files.length) return rOut({ error: 'Selecione uma foto' });
+    const fd = new FormData();
+    fd.append('photo', fileInput.files[0]);
+    if (notes) fd.append('notes', notes);
+    await rFetch('', { method: 'POST', body: fd });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const active = document.getElementById('form-login').style.display !== 'none' ? 'login' : 'signup';
+      active === 'login' ? doLogin() : doSignup();
+    }
+  });
+</script>
+</body>
+</html>
