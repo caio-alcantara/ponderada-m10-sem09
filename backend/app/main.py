@@ -21,11 +21,11 @@ origins = (
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],        # em dev, libera tudo
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-)
+)   
 
 app.add_exception_handler(Exception, generic_exception_handler)
 
