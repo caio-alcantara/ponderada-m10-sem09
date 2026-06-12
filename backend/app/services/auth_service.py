@@ -16,7 +16,6 @@ def _build_token_out(session, name: str | None = None) -> TokenOut:
         ),
     )
 
-
 def signup(data: SignupIn, supabase: Client) -> TokenOut:
     try:
         result = supabase.auth.sign_up(
@@ -28,10 +27,17 @@ def signup(data: SignupIn, supabase: Client) -> TokenOut:
             detail=str(exc),
         ) from exc
 
+    # Supabase retorna user sem identities quando o e-mail já está cadastrado
+    if result.user and not result.user.identities:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Este e-mail já está cadastrado.",
+        )
+
     if not result.session:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cadastro realizado, mas sessão não retornada. Verifique se 'Confirm email' está desativado no Supabase.",
+            detail="Sessão não retornada. Desative 'Confirm email' no Supabase (Authentication → Settings).",
         )
 
     user_id = str(result.user.id)
@@ -47,7 +53,6 @@ def signup(data: SignupIn, supabase: Client) -> TokenOut:
         ) from exc
 
     return _build_token_out(result, name=data.name)
-
 
 def login(data: LoginIn, supabase: Client) -> TokenOut:
     try:
