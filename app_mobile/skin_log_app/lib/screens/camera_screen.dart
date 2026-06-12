@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../services/api_service.dart';
+import '../services/notification_service.dart';
 import '../theme.dart';
 import '../widgets/face_oval_painter.dart';
 
@@ -156,6 +157,7 @@ class _CameraScreenState extends State<CameraScreen> {
             : _notesController.text.trim(),
       );
       setState(() => _result = record);
+      await NotificationService.cancelAll();
     } on ApiException catch (e) {
       setState(() => _error = e.message);
     } catch (e) {

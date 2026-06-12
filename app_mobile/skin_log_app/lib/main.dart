@@ -5,8 +5,11 @@ import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/camera_screen.dart';
 import 'screens/analysis_screen.dart';
+import 'services/notification_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService.init();
   runApp(const SkinLogApp());
 }
 
