@@ -1,0 +1,35 @@
+name: skinlog
+description: SkinLog — registro e análise de pele.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # HTTP
+  http: ^1.2.1
+  http_parser: ^4.0.0
+
+  # Câmera ao vivo (preview com guia oval)
+  camera: ^0.11.0
+
+  # Galeria
+  image_picker: ^1.1.2
+
+  # Tipografia
+  google_fonts: ^6.2.1
+
+  # Persistência local (tokens)
+  shared_preferences: ^2.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
