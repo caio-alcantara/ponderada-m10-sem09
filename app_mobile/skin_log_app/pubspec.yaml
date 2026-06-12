@@ -26,6 +26,14 @@ dependencies:
   # Persistência local (tokens)
   shared_preferences: ^2.3.1
 
+  # Notificações locais
+  flutter_local_notifications: ^18.0.0
+  timezone: ^0.9.0
+  flutter_timezone: ^1.0.7
+
+  # Compartilhamento nativo
+  share_plus: ^10.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
