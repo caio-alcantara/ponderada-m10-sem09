@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import '../services/api_service.dart';
+import '../services/notification_service.dart';
 import '../theme.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -39,6 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _latest = results[1];
         _streak = results[2];
       });
+      await NotificationService.scheduleOrCancel(_registeredToday);
     } on ApiException catch (e) {
       setState(() => _error = e.message);
     } catch (e) {
@@ -51,6 +54,15 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _logout() async {
     await ApiService.logout();
     if (mounted) Navigator.pushReplacementNamed(context, '/login');
+  }
+
+  void _shareInvite() {
+    Share.share(
+      'Estou usando o SkinLog para monitorar minha pele com inteligência artificial! 📱\n\n'
+      'Registro uma foto por dia e acompanho a evolução da minha pele com análise de IA.\n\n'
+      'Experimente também!',
+      subject: 'Conheça o SkinLog',
+    );
   }
 
   bool get _registeredToday {
@@ -149,6 +161,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     icon: const Icon(Icons.insights_outlined),
                     label: const Text('Ver análises'),
+                  ),
+
+                  const SizedBox(height: AppSpacing.md),
+
+                  // ── Convidar amigos ───────────────────────────────────────
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: _shareInvite,
+                      icon: const Icon(Icons.share_outlined, size: 18),
+                      label: const Text('Convidar amigos'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.muted,
+                      ),
+                    ),
                   ),
                 ],
               ),
