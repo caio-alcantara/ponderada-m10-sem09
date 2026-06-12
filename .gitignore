@@ -1,0 +1,6 @@
+# Config local da ferramenta AbacusAI / CodeLLM
+.abacusai/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
