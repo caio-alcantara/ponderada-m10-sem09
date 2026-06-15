@@ -42,44 +42,29 @@ Pessoas em tratamentos dermatológicos (como Roacutan/Isotretinoína) têm dific
 
 ### 2.1 Vídeo
 
-<!-- Link do vídeo (problema, solução, etapas, considerações finais). -->
+https://www.youtube.com/shorts/RmO5_gJjMdg
 
 ### 2.2 Telas do Aplicativo
 
-<!-- Cole os prints de cada tela nos espaços abaixo. -->
-
 #### Splash / Inicialização
 
-<!-- ![Splash](caminho/para/print-splash.png) -->
+![Splash](assets/splash_screen.jpg)
 
 #### Login / Cadastro
 
-<!-- ![Login](caminho/para/print-login.png) -->
+![Login](assets/login.jpg)
 
 #### Home
 
-<!-- ![Home](caminho/para/print-home.png) -->
+![Home](assets/home.jpg)
 
 #### Câmera (captura com guia oval)
 
-<!-- ![Câmera](caminho/para/print-camera.png) -->
-
-#### Revisão e Envio do Registro
-
-<!-- ![Revisão](caminho/para/print-revisao.png) -->
+![Câmera](assets/camera.jpg)
 
 #### Análises (listagem)
 
-<!-- ![Análises](caminho/para/print-analises.png) -->
-
-#### Detalhe do Registro
-
-<!-- ![Detalhe](caminho/para/print-detalhe.png) -->
-
-#### Comparação Antes / Depois
-
-<!-- ![Comparação](caminho/para/print-comparacao.png) -->
-
+![Análises](assets/analises.jpg)
 
 
 ## 3. Funcionalidades
