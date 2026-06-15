@@ -6,13 +6,62 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static String get baseUrl {
-  if (kIsWeb) {
-    return 'http://localhost:8000/api/v1';
+  // ─── Backend origin (configurável) ─────────────────────────────────────────
+
+  static const String _originPrefKey = 'backend_origin';
+
+  /// Origin padrão por plataforma (sem o sufixo `/api/v1`).
+  static String get defaultOrigin =>
+      kIsWeb ? 'http://localhost:8000' : 'http://10.0.2.2:8000';
+
+  /// Cache em memória do origin salvo, para manter [baseUrl] síncrono.
+  static String? _cachedOrigin;
+
+  /// Carrega o origin salvo a partir do disco. Chame uma vez no startup.
+  static Future<void> loadBaseUrl() async {
+    final prefs = await SharedPreferences.getInstance();
+    _cachedOrigin = prefs.getString(_originPrefKey);
   }
-  // Emulador Android
-  return 'http://10.0.2.2:8000/api/v1';
-}
+
+  /// Origin atualmente em uso (customizado ou o padrão da plataforma).
+  static String get currentOrigin =>
+      (_cachedOrigin != null && _cachedOrigin!.isNotEmpty)
+          ? _cachedOrigin!
+          : defaultOrigin;
+
+  /// `true` quando há um origin customizado salvo.
+  static bool get isUsingCustomOrigin =>
+      _cachedOrigin != null && _cachedOrigin!.isNotEmpty;
+
+  /// Define um origin customizado (ex.: `http://192.168.0.10:8000`).
+  /// Normaliza o valor e persiste em disco.
+  static Future<void> setBackendOrigin(String origin) async {
+    var normalized = origin.trim();
+    // Remove barras finais e um eventual sufixo `/api/v1` digitado a mais.
+    while (normalized.endsWith('/')) {
+      normalized = normalized.substring(0, normalized.length - 1);
+    }
+    if (normalized.endsWith('/api/v1')) {
+      normalized = normalized.substring(0, normalized.length - '/api/v1'.length);
+    }
+    // Adiciona esquema http:// caso o usuário não tenha informado.
+    if (!normalized.startsWith('http://') &&
+        !normalized.startsWith('https://')) {
+      normalized = 'http://$normalized';
+    }
+    _cachedOrigin = normalized;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_originPrefKey, normalized);
+  }
+
+  /// Remove o origin customizado, voltando ao padrão da plataforma.
+  static Future<void> clearBackendOrigin() async {
+    _cachedOrigin = null;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_originPrefKey);
+  }
+
+  static String get baseUrl => '$currentOrigin/api/v1';
 
   // ─── Token storage ────────────────────────────────────────────────────────
 

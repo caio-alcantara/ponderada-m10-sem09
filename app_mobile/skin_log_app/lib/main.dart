@@ -6,9 +6,11 @@ import 'screens/home_screen.dart';
 import 'screens/camera_screen.dart';
 import 'screens/analysis_screen.dart';
 import 'services/notification_service.dart';
+import 'services/api_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await ApiService.loadBaseUrl();
   await NotificationService.init();
   runApp(const SkinLogApp());
 }

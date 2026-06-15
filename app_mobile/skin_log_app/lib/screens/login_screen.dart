@@ -59,6 +59,19 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  /// Diálogo escondido (long-press no logo) para configurar a URL do backend.
+  Future<void> _openBackendConfig() async {
+    final message = await showDialog<String>(
+      context: context,
+      builder: (_) => const _BackendConfigDialog(),
+    );
+    if (message == null || !mounted) return;
+    setState(() => _error = null);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,14 +86,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // ── Wordmark ──────────────────────────────────────────────
-                  Text(
-                    'SkinLog',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.5,
-                        ),
+                  // ── Wordmark (long-press: configurar backend) ─────────────
+                  GestureDetector(
+                    onLongPress: _openBackendConfig,
+                    behavior: HitTestBehavior.opaque,
+                    child: Text(
+                      'SkinLog',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5,
+                          ),
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
@@ -160,6 +177,89 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Diálogo escondido para configurar a URL do backend.
+///
+/// É um widget próprio para que o [TextEditingController] tenha seu ciclo de
+/// vida gerenciado por um State — evitando "used after being disposed" quando o
+/// diálogo fecha com animação. Retorna uma mensagem de feedback via `pop`, ou
+/// `null` se cancelado.
+class _BackendConfigDialog extends StatefulWidget {
+  const _BackendConfigDialog();
+
+  @override
+  State<_BackendConfigDialog> createState() => _BackendConfigDialogState();
+}
+
+class _BackendConfigDialogState extends State<_BackendConfigDialog> {
+  late final TextEditingController _controller =
+      TextEditingController(text: ApiService.currentOrigin);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final value = _controller.text.trim();
+    if (value.isEmpty) {
+      await ApiService.clearBackendOrigin();
+    } else {
+      await ApiService.setBackendOrigin(value);
+    }
+    if (mounted) Navigator.pop(context, 'Backend: ${ApiService.currentOrigin}');
+  }
+
+  Future<void> _reset() async {
+    await ApiService.clearBackendOrigin();
+    if (mounted) Navigator.pop(context, 'Backend redefinido para o padrão.');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Configurar backend'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'URL onde o backend está rodando. '
+              'Ex.: http://192.168.0.10:8000',
+              style: TextStyle(fontSize: 13, color: AppColors.muted),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            TextField(
+              controller: _controller,
+              autofocus: true,
+              keyboardType: TextInputType.url,
+              onSubmitted: (_) => _save(),
+              decoration: const InputDecoration(
+                labelText: 'URL do backend',
+                hintText: 'http://192.168.0.10:8000',
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              'Padrão: ${ApiService.defaultOrigin}',
+              style: const TextStyle(fontSize: 12, color: AppColors.muted),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: _reset, child: const Text('Redefinir')),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(onPressed: _save, child: const Text('Salvar')),
+      ],
     );
   }
 }
