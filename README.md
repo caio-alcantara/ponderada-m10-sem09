@@ -209,4 +209,14 @@ flutter pub get
 flutter run
 ```
 
-O app aponta para `http://localhost:8000` na web e para `http://10.0.2.2:8000` no emulador Android, então o backend precisa estar rodando antes. O endereço fica em `lib/services/api_service.dart`.
+Por padrão o app aponta para `http://localhost:8000` na web e para `http://10.0.2.2:8000` no emulador Android, então o backend precisa estar rodando antes.
+
+### 6.5 Configurar a URL do Backend no App
+
+Para apontar o app para um backend em outro endereço (máquina na rede local, deploy, etc.), há uma configuração escondida na tela de login:
+
+1. **Segure pressionado (long-press) o logo "SkinLog"** na tela de login.
+2. No diálogo, informe a URL do servidor — apenas o `host:porta`, sem `/api/v1` (ex.: `http://192.168.0.10:8000`). O app adiciona o prefixo `/api/v1` automaticamente.
+3. Toque em **Salvar**. O endereço fica guardado no dispositivo. Use **Redefinir** para voltar ao padrão.
+
+Para acessar um backend rodando no seu PC a partir de um celular físico, use o IP da máquina na rede (ex.: `http://192.168.0.10:8000`) e rode o backend com `--host 0.0.0.0`, garantindo que o celular esteja na mesma rede Wi-Fi.
