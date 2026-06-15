@@ -86,7 +86,7 @@ As principais funcionalidades do app incluem:
 A tabela abaixo resume como cada requisito da atividade foi atendido.
 
 | Requisito | Como foi atendido | Onde |
-|--|-||
+|---|---|---|
 | Aplicação mobile | App em Flutter | `app_mobile/skin_log_app` |
 | Mais de 2 telas | Splash, Login, Home, Câmera e Análises | `lib/screens` |
 | Navegação funcional | Rotas nomeadas com `Navigator` | `lib/main.dart` |
@@ -143,7 +143,7 @@ O projeto tem duas partes: o aplicativo Flutter e a API em FastAPI. O app fala a
 ### Endpoints principais
 
 | Método | Rota | Descrição |
-|--||--|
+|---|---|---|
 | GET | `/health` | Verifica se a API está no ar |
 | POST | `/api/v1/auth/signup` | Cria conta e perfil |
 | POST | `/api/v1/auth/login` | Faz login |
