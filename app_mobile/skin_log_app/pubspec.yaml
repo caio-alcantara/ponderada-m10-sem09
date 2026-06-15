@@ -29,7 +29,7 @@ dependencies:
   # Notificações locais
   flutter_local_notifications: ^18.0.0
   timezone: ^0.9.0
-  flutter_timezone: ^1.0.7
+  flutter_timezone: ^3.0.1
 
   # Compartilhamento nativo
   share_plus: ^10.0.0
